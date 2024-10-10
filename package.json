@@ -1,0 +1,19 @@
+{
+  "name": "test-node-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hello-world.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codyBiem17/test-nodeapp-ghactions.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codyBiem17/test-nodeapp-ghactions/issues"
+  },
+  "homepage": "https://github.com/codyBiem17/test-nodeapp-ghactions#readme"
+}
