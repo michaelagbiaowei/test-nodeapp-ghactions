@@ -4,7 +4,7 @@
   "description": "",
   "main": "hello-world.js",
   "scripts": {
-    "test": "npm run test"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/codyBiem17/test-nodeapp-ghactions/issues"
   },
-  "homepage": "https://github.com/codyBiem17/test-nodeapp-ghactions#readme"
+  "homepage": "https://github.com/codyBiem17/test-nodeapp-ghactions#readme",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
 }
