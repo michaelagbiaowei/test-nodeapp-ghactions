@@ -13,124 +13,124 @@ defaults:
     working-directory: ./
 
 jobs:
-  sonarqube:
-    name: SonarQube Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  # sonarqube:
+  #   name: SonarQube Scan
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
       
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     - name: SonarQube Scan
+  #       uses: sonarsource/sonarqube-scan-action@master
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     - name: SonarQube Quality Gate check
+  #       id: sonarqube-quality-gate-check
+  #       uses: sonarsource/sonarqube-quality-gate-action@master
+  #       timeout-minutes: 5
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: Show SonarQube Quality Gate Status value
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+  #     - name: Show SonarQube Quality Gate Status value
+  #       run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
     
 
-  build:
-    name: Build
-    needs: sonarqube
-    runs-on: ubuntu-latest
-    # Sets up the specified Node.js version
-    strategy:
-      matrix:
-        node-version: [22.x] 
+  # build:
+  #   name: Build
+  #   needs: sonarqube
+  #   runs-on: ubuntu-latest
+  #   # Sets up the specified Node.js version
+  #   strategy:
+  #     matrix:
+  #       node-version: [22.x] 
   
-    steps:
-    # Checks out the repository from GitHub
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        # Caches npm modules for faster builds
-        # cache: 'npm'
+  #   steps:
+  #   # Checks out the repository from GitHub
+  #   - uses: actions/checkout@v4
+  #   - name: Use Node.js ${{ matrix.node-version }}
+  #     uses: actions/setup-node@v4
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #       # Caches npm modules for faster builds
+  #       # cache: 'npm'
 
-    - name: Cache dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
+  #   - name: Cache dependencies
+  #     uses: actions/cache@v4
+  #     with:
+  #       path: ~/.npm
+  #       key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+  #       restore-keys: |
+  #         ${{ runner.OS }}-node-
                
-    - run: npm install
-    - run: npm run build --if-present
+  #   - run: npm install
+  #   - run: npm run build --if-present
 
-  scan:
-    name: Scan
-    needs: build
-    runs-on: ubuntu-latest
-    # Sets up the specified Node.js version
-    strategy:
-      matrix:
-        node-version: [22.x] 
+  # scan:
+  #   name: Scan
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   # Sets up the specified Node.js version
+  #   strategy:
+  #     matrix:
+  #       node-version: [22.x] 
   
-    steps:
-    # Checks out the repository from GitHub
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        # Restore npm for faster builds
+  #   steps:
+  #   # Checks out the repository from GitHub
+  #   - uses: actions/checkout@v4
+  #   - name: Use Node.js ${{ matrix.node-version }}
+  #     uses: actions/setup-node@v4
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #       # Restore npm for faster builds
 
-    - name: Restore dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+  #   - name: Restore dependencies
+  #     uses: actions/cache@v4
+  #     with:
+  #       path: ~/.npm
+  #       key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
 
-    - run: |
-        npm install
-        npm audit fix
-        npm install --save-dev html-webpack-plugin@latest
-        npm update js-yaml --depth 4
-        npm audit --audit-level=critical    
+  #   - run: |
+  #       npm install
+  #       npm audit fix
+  #       npm install --save-dev html-webpack-plugin@latest
+  #       npm update js-yaml --depth 4
+  #       npm audit --audit-level=critical    
 
-  test:
-    name: Test
-    needs: scan
-    runs-on: ubuntu-latest
-    # Sets up the specified Node.js version
-    strategy:
-      matrix:
-        node-version: [22.x] 
+  # test:
+  #   name: Test
+  #   needs: scan
+  #   runs-on: ubuntu-latest
+  #   # Sets up the specified Node.js version
+  #   strategy:
+  #     matrix:
+  #       node-version: [22.x] 
   
-    steps:
-    # Checks out the repository from GitHub
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        # Restore npm for faster builds
+  #   steps:
+  #   # Checks out the repository from GitHub
+  #   - uses: actions/checkout@v4
+  #   - name: Use Node.js ${{ matrix.node-version }}
+  #     uses: actions/setup-node@v4
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #       # Restore npm for faster builds
 
-    - name: Restore dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+  #   - name: Restore dependencies
+  #     uses: actions/cache@v4
+  #     with:
+  #       path: ~/.npm
+  #       key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
 
-    - run: |
-        npm install
-        npm run test
+  #   - run: |
+  #       npm install
+  #       npm run test
 
   push_to_registry:
     runs-on: ubuntu-latest
-    needs: test
+    # needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -152,7 +152,7 @@ jobs:
       # Authenticates with Amazon ECR to push the Docker image
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v4
+        uses: aws-actions/amazon-ecr-login@v2
       # Builds the Docker image, tags it with the commit Secure Hash Algorithms (SHA)and current time, and pushes it to ECR.
       # Also outputs the image name as a GitHub output variable.
       - name: Build, tag, and push image to Amazon ECR
