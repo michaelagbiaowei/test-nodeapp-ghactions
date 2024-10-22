@@ -255,3 +255,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
+          format: 'table'
+          scan-type: 'image'
+          cache: 'false'
+          skip-setup-trivy: true
