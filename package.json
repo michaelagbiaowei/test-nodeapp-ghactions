@@ -4,7 +4,9 @@
   "description": "",
   "main": "hello-world.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "scan": "npm audit",
+    "scan:fix": "npm audit fix"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,7 @@
   },
   "homepage": "https://github.com/codyBiem17/test-nodeapp-ghactions#readme",
   "devDependencies": {
+    "html-webpack-plugin": "^5.6.2",
     "jest": "^29.7.0",
     "supertest": "^7.0.0"
   }
