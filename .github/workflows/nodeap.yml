@@ -13,181 +13,145 @@ defaults:
     working-directory: ./
 
 jobs:
-  # sonarqube:
-  #   name: SonarQube Scan
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-      
-  #     - name: SonarQube Scan
-  #       uses: sonarsource/sonarqube-scan-action@master
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-  #     - name: SonarQube Quality Gate check
-  #       id: sonarqube-quality-gate-check
-  #       uses: sonarsource/sonarqube-quality-gate-action@master
-  #       timeout-minutes: 5
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-  #     - name: Show SonarQube Quality Gate Status value
-  #       run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
-    
-
-  # build:
-  #   name: Build
-  #   needs: sonarqube
-  #   runs-on: ubuntu-latest
-  #   # Sets up the specified Node.js version
-  #   strategy:
-  #     matrix:
-  #       node-version: [22.x] 
-  
-  #   steps:
-  #   # Checks out the repository from GitHub
-  #   - uses: actions/checkout@v4
-  #   - name: Use Node.js ${{ matrix.node-version }}
-  #     uses: actions/setup-node@v4
-  #     with:
-  #       node-version: ${{ matrix.node-version }}
-  #       # Caches npm modules for faster builds
-  #       # cache: 'npm'
-
-  #   - name: Cache dependencies
-  #     uses: actions/cache@v4
-  #     with:
-  #       path: ~/.npm
-  #       key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-  #       restore-keys: |
-  #         ${{ runner.OS }}-node-
-               
-  #   - run: npm install
-  #   - run: npm run build --if-present
-
-  # scan:
-  #   name: Scan
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   # Sets up the specified Node.js version
-  #   strategy:
-  #     matrix:
-  #       node-version: [22.x] 
-  
-  #   steps:
-  #   # Checks out the repository from GitHub
-  #   - uses: actions/checkout@v4
-  #   - name: Use Node.js ${{ matrix.node-version }}
-  #     uses: actions/setup-node@v4
-  #     with:
-  #       node-version: ${{ matrix.node-version }}
-  #       # Restore npm for faster builds
-
-  #   - name: Restore dependencies
-  #     uses: actions/cache@v4
-  #     with:
-  #       path: ~/.npm
-  #       key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-
-  #   - run: |
-  #       npm install
-  #       npm audit fix
-  #       npm install --save-dev html-webpack-plugin@latest
-  #       npm update js-yaml --depth 4
-  #       npm audit --audit-level=critical    
-
-  # test:
-  #   name: Test
-  #   needs: scan
-  #   runs-on: ubuntu-latest
-  #   # Sets up the specified Node.js version
-  #   strategy:
-  #     matrix:
-  #       node-version: [22.x] 
-  
-  #   steps:
-  #   # Checks out the repository from GitHub
-  #   - uses: actions/checkout@v4
-  #   - name: Use Node.js ${{ matrix.node-version }}
-  #     uses: actions/setup-node@v4
-  #     with:
-  #       node-version: ${{ matrix.node-version }}
-  #       # Restore npm for faster builds
-
-  #   - name: Restore dependencies
-  #     uses: actions/cache@v4
-  #     with:
-  #       path: ~/.npm
-  #       key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-
-  #   - run: |
-  #       npm install
-  #       npm run test
-
-
-
-  # trivy:
-  #   name: Daily Vulnerability Scan
-  #   needs: push_to_registry
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     # Configures AWS credentials for accessing ECR.
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
-
-  #     # Authenticates with Amazon ECR to pull the Docker image
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v2
-
-  #     # Pull Docker image from ECR
-  #     - name: Pull Puddle Docker Image
-  #       run: docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}
-
-  #     # Scan Docker image for vulnerabilities using Trivy
-  #     - name: Scan Docker Image
-  #       uses: aquasecurity/trivy-action@master
-  #       with:
-  #         image-ref: "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}"
-  #         exit-code: "1"
-  #         ignore-unfixed: true
-  #         vuln-type: "os,library"
-  #         severity: "CRITICAL,HIGH"
-  #         format: 'table'
-  #         scan-type: 'image'
-  #         cache: 'false'
-  #         skip-setup-trivy: true
-
-  push_to_registry:
+  sonarqube:
+    name: SonarQube Scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          fetch-depth: 0
+      
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: Build, tag, and push image to Amazon ECR
-        run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} .
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} 
-          echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+      - name: Show SonarQube Quality Gate Status value
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+    
+
+  build:
+    name: Build
+    needs: sonarqube
+    runs-on: ubuntu-latest
+    # Sets up the specified Node.js version
+    strategy:
+      matrix:
+        node-version: [22.x] 
+  
+    steps:
+    # Checks out the repository from GitHub
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        # Caches npm modules for faster builds
+        # cache: 'npm'
+
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-node-
+               
+    - run: npm install
+    - run: npm run build --if-present
+
+  scan:
+    name: Scan
+    needs: build
+    runs-on: ubuntu-latest
+    # Sets up the specified Node.js version
+    strategy:
+      matrix:
+        node-version: [22.x] 
+  
+    steps:
+    # Checks out the repository from GitHub
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        # Restore npm for faster builds
+
+    - name: Restore dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+
+    - run: |
+        npm install
+        npm audit fix
+        npm install --save-dev html-webpack-plugin@latest
+        npm update js-yaml --depth 4
+        npm audit --audit-level=critical    
+
+  test:
+    name: Test
+    needs: scan
+    runs-on: ubuntu-latest
+    # Sets up the specified Node.js version
+    strategy:
+      matrix:
+        node-version: [22.x] 
+  
+    steps:
+    # Checks out the repository from GitHub
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        # Restore npm for faster builds
+
+    - name: Restore dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+
+    - run: |
+        npm install
+        npm run test
+
+  push_to_registry:
+    name: Push To Registry
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      run: |
+        docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} .
+        docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} 
+        echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_OUTPUT
   
   trivy:
     name: Daily Vulnerability Scan
