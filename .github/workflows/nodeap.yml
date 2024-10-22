@@ -252,9 +252,8 @@ jobs:
         with:
           image-ref: "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
           exit-code: "1"
-          ignore-unfixed: true
+          ignore-unfixed: fasle
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
           format: 'table'
-          scan-type: 'image'
           cache: 'false'
