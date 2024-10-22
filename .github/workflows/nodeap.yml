@@ -130,27 +130,34 @@ jobs:
 
   push_to_registry:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+        
+      # Configures AWS credentials for accessing ECR.
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Authenticates with Amazon ECR to push the Docker image
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      # Get current time
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_OUTPUT
+
+      # Build, tag, and push image to Amazon ECR
       - name: Build, tag, and push image to Amazon ECR
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} .
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }} 
-          echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }} .
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}
+          echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}" >> $GITHUB_OUTPUT
 
 
   # trivy:
@@ -173,13 +180,13 @@ jobs:
 
   #     # Pull Docker image from ECR
   #     - name: Pull Puddle Docker Image
-  #       run: docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+  #       run: docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}
 
   #     # Scan Docker image for vulnerabilities using Trivy
   #     - name: Scan Docker Image
   #       uses: aquasecurity/trivy-action@master
   #       with:
-  #         image-ref: "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
+  #         image-ref: "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}"
   #         exit-code: "1"
   #         ignore-unfixed: true
   #         vuln-type: "os,library"
