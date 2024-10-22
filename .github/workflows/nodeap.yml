@@ -241,17 +241,17 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ GITHUB_SHA::6 }} .
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ GITHUB_SHA::6 }} 
-          echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ GITHUB_SHA::6 }}" >> $GITHUB_OUTPUT
+          docker build -t "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha::5 }}" .
+          docker push "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha::5 }} "
+          echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha::5 }}" >> $GITHUB_OUTPUT
   
       - name: Pull Docker Image From ECR
-        run: docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ GITHUB_SHA::6 }}
+        run: docker pull "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha::5 }}"
   
       - name: Scan Docker Image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ GITHUB_SHA::6 }}
+          image-ref: "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha::5 }}"
           exit-code: "1"
           ignore-unfixed: true
           vuln-type: "os,library"
