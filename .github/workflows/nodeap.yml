@@ -255,5 +255,4 @@ jobs:
           ignore-unfixed: fasle
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
-          format: 'table'
           cache: 'false'
