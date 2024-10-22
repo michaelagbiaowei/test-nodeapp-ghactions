@@ -174,11 +174,10 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-    
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
     - name: Pull Puddle Docker Image
-        run: docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}
+      run: docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}
 
     - name: Scan Frontend Docker Image
       uses: aquasecurity/trivy-action@master
