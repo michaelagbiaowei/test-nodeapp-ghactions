@@ -3,9 +3,9 @@ name: Puddle Service (build workflow)
 # This workflow builds, tests, and deploys a Node.js application to ECR.
 # It includes steps for building the application, and scanning for vulnerabilities.
 
-#on:
-#   push:
-#     branches: [ "main" ]
+on:
+  push:
+    branches: [ "main" ]
 
 defaults:
   run:
