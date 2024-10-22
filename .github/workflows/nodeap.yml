@@ -169,13 +169,18 @@ jobs:
         with:
           image-ref: "${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA::6}-${{ steps.date.outputs.date }}"
           exit-code: "1"
+          # ignore-unfixed: true
+          # vuln-type: "os,library"
+          # severity: "CRITICAL,HIGH"
+          # format: 'table'
+          # scan-type: 'image'
+          # cache: 'false'
+          # skip-setup-trivy: true
+
+          exit-code: "1"
           ignore-unfixed: true
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
-          format: 'table'
-          scan-type: 'image'
-          cache: 'false'
-          skip-setup-trivy: true
 
 
 
